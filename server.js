@@ -7,19 +7,20 @@ dns.setServers([
 
 require("dotenv").config();
 
-const authRoutes = require("./authRoutes");
+const authRoutes = require("./Backend/authRoutes");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const connectDB = require("./config");
-const protect = require("./authMiddleware");
-const productRoutes = require("./productRoutes");
-const cartRoutes = require("./cartRoutes");
-const paymentRoutes = require("./paymentRoutes");
-const orderRoutes = require("./orderRoutes");
-const transportRoutes = require("./transportRoutes");
-const adminRoutes = require("./adminRoutes");
-const farmerDashboardRoutes = require("./farmerDashboardRoutes");
+const connectDB = require("./Backend/config");
+const protect = require("./Backend/authMiddleware");
+const productRoutes = require("./Backend/productRoutes");
+const cartRoutes = require("./Backend/cartRoutes");
+const paymentRoutes = require("./Backend/paymentRoutes");
+const orderRoutes = require("./Backend/orderRoutes");
+const transportRoutes = require("./Backend/transportRoutes");
+const adminRoutes = require("./Backend/adminRoutes");
+const farmerDashboardRoutes = require("./Backend/farmerDashboardRoutes");
+const profileRoutes = require("./profileRoutes");
 
 
 const app = express();
@@ -50,6 +51,8 @@ app.use("/api/transport", transportRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/farmer-dashboard", farmerDashboardRoutes);
+
+app.use("/api/profile", profileRoutes);
 
 //Images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

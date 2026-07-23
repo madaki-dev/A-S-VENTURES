@@ -1,27 +1,18 @@
+require("dotenv").config();
+
 const adminOnly = (req, res, next) => {
-
     if (!req.user) {
-
-        return res.status(401).json({
-
-            message: "Not Authorized"
-
-        });
-
+        return res.status(401).json({ message: "Not Authorized" });
     }
 
-    if (req.user.role !== "Admin") {
+    // Read allowed emails from env
+    const allowedAdmins = process.env.ADMIN_EMAILS.split(",");
 
-        return res.status(403).json({
-
-            message: "Admin Access Only"
-
-        });
-
+    if (!allowedAdmins.includes(req.user.email)) {
+        return res.status(403).json({ message: "Admin Access Only" });
     }
 
     next();
-
 };
 
 module.exports = adminOnly;
