@@ -1,3 +1,4 @@
+require("dotenv").config;
 const User = require("./User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -48,7 +49,17 @@ exports.register = async (req, res) => {
 
             accountType: user.accountType,
 
+            role: user.role,
+
         };
+
+        // Check if email is in ADMIN_EMAILS list
+        const allowedAdmins = process.env.ADMIN_EMAILS.split(",");
+        if (allowedAdmins.includes(email)) {
+            user.role = "Admin"; // promote automatically
+        }
+
+        await user.save();
 
         const token = jwt.sign(
             { id: user._id },
