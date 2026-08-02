@@ -216,15 +216,15 @@ exports.updateOrderStatus = async (req, res) => {
 
 exports.confirmFarmerDetails = async (req, res) => {
     try {
-        const { farmerName, farmerPhone, accountNumber } = req.body;
-        if (!farmerName || !farmerPhone || !accountNumber) {
+        const { farmerName, farmerPhone, accountNumber, bankName, accountName } = req.body;
+        if (!farmerName || !farmerPhone || !accountNumber || !bankName || !accountName) {
             return res.status(400).json({ message: "Farmer details required." });
         }
 
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ message: "Order not found" });
 
-        order.farmerConfirmation = { farmerName, farmerPhone, accountNumber };
+        order.farmerConfirmation = { farmerName, farmerPhone, accountNumber, bankName, accountName };
         await order.save();
 
         res.json({ message: "Farmer details confirmed", order });

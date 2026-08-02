@@ -7,7 +7,7 @@ exports.createProduct = async (req, res) => {
 
         const farmerPrice = Number(req.body.price);
 
-        const commission = farmerPrice * 0.4;
+        const commission = farmerPrice * 0.07;
 
         const sellingPrice = farmerPrice + commission;
 
