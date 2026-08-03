@@ -21,11 +21,14 @@ const orderSchema = new mongoose.Schema({
 
             commission: Number,
 
-            transport: Number,
-
             sellingPrice: Number
         }
     ],
+
+    transportFee: {
+        type: Number,
+        required: true
+    },
 
     totalAmount: {
         type: Number,
@@ -77,7 +80,9 @@ const orderSchema = new mongoose.Schema({
     farmerConfirmation: {
         farmerName: { type: String },
         farmerPhone: { type: String },
-        accountNumber: { type: String }
+        accountNumber: { type: String },
+        bankName: { type: String },
+        accountName: { type: String }
     }
 
 }, { timestamps: true });

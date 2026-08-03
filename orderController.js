@@ -1,80 +1,6 @@
 const Order = require("./Order");
 const Cart = require("./Cart");
 
-exports.createOrder = async (req, res) => {
-
-    try {
-
-        const cart = await Cart.find({
-            buyer: req.user._id
-        }).populate("product");
-
-        if (cart.length === 0) {
-
-            return res.status(400).json({
-
-                message: "Cart is empty."
-
-            });
-        }
-
-        const { fullname, phone, whatsapp, state, address, transactionId } = req.body;
-        if (!fullname || !phone || !whatsapp || !state || !address) {
-            return res.status(400).json({ message: "Delivery details required." });
-        }
-
-        let total = 0;
-
-        const products = [];
-
-        cart.forEach(item => {
-
-            total += item.product.price * item.quantity;
-
-            products.push({
-
-                product: item.product._id,
-
-                quantity: item.quantity,
-
-                price: item.product.price
-            });
-        });
-
-        const order = await Order.create({
-
-            buyer: req.user._id,
-
-            products,
-
-            totalAmount: total,
-
-            transactionId: req.body.transactionId,
-
-            status: "Pending"
-        });
-
-        await Cart.deleteMany({
-            buyer: req.user._id
-        });
-
-        res.status(201).json({
-
-            message: "Order placed successfully.",
-
-            order
-
-        });
-    } catch (error) {
-
-        res.status(500).json({
-
-            message: error.message
-
-        });
-    }
-};
-
 //Get Buyer's Orders
 
 exports.getMyOrders = async (req, res) => {
@@ -106,8 +32,8 @@ exports.getFarmerSales = async (req, res) => {
 
         const order = await Order.find()
 
-            .populate("products.products")
-            .populate("buyer", "fullname email");
+            .populate("products.product")
+            .populate("buyer", "fullName email");
 
         const sales = [];
 
@@ -122,13 +48,13 @@ exports.getFarmerSales = async (req, res) => {
 
                     sales.push({
 
-                        buyer: order.buyer.fullname,
+                        buyer: order.buyer.fullName,
 
                         product: item.product.productName,
 
                         quantity: item.quantity,
 
-                        amount: item.price * item.quantity,
+                        amount: item.sellingPrice * item.quantity,
 
                         date: order.createdAt
 
@@ -136,6 +62,7 @@ exports.getFarmerSales = async (req, res) => {
                 }
             });
         });
+        res.json(sales);
     } catch (error) {
 
         res.status(500).json({

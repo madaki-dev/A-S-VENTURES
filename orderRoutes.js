@@ -20,8 +20,6 @@ const farmerOnly = require("./farmerMiddleware");
 
 const buyerOnly = require("./buyerMiddleware");
 
-router.post("/", protect, buyerOnly, createOrder);
-
 router.get("/my-orders", protect, buyerOnly, getMyOrders);
 
 router.get("/farmer-sales", protect, farmerOnly, getFarmerSales);
