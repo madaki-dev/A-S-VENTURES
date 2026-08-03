@@ -104,3 +104,37 @@ exports.updateTransportPrice = async (req, res) => {
     }
 
 };
+
+// Get transport price for a specific state
+exports.getTransportPriceByState = async (req, res) => {
+
+    try {
+
+        const state = req.params.state;
+
+        const transport = await Transport.findOne({
+            state: {
+                $regex: `^${state}$`,
+                $options: "i"
+            }
+        });
+
+        if (!transport) {
+
+            return res.status(404).json({
+                message: "Transport price not found for this state."
+            });
+
+        }
+
+        res.json(transport);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+};

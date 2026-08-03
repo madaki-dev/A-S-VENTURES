@@ -10,6 +10,8 @@ const {
 
     getTransportPrices,
 
+    getTransportPriceByState,
+
     updateTransportPrice
 
 } = require("./transportController");
@@ -19,6 +21,8 @@ router.post("/", createTransport);
 router.get("/", getTransport);
 
 router.get("/prices", getTransportPrices);
+
+router.get("/prices/:state", getTransportPriceByState);
 
 router.patch("/:id", updateTransportPrice);
 
