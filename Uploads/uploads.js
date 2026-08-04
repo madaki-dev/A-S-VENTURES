@@ -1,19 +1,30 @@
 const multer = require("multer");
+const path = require("path");
 
 const storage = multer.diskStorage({
 
     destination: function (req, file, cb) {
 
-        cb(null, "uploads/");  // save to uploads folder
+        cb(null, "uploads/");
 
     },
 
     filename: function (req, file, cb) {
 
-        cb(null, Date.now() + "_" + file.originalname); // unique filename
+        const extension =
+            path.extname(file.originalname);
+
+        const filename =
+            Date.now() + "_" +
+            Math.round(Math.random() * 1E9) +
+            extension;
+
+        cb(null, filename);
 
     }
+
 });
+
 
 const fileFilter = (req, file, cb) => {
 
@@ -23,16 +34,29 @@ const fileFilter = (req, file, cb) => {
 
     } else {
 
-        cb(new Error("Only image files are allowed."), false);
+        cb(
+            new Error("Only image files are allowed."),
+            false
+        );
 
     }
+
 };
+
 
 const upload = multer({
 
     storage,
 
-    fileFilter
+    fileFilter,
+
+    limits: {
+
+        fileSize: 5 * 1024 * 1024
+
+    }
+
 });
+
 
 module.exports = upload;

@@ -65,11 +65,6 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get("/api/profile", protect, (req, res) => {
-
-    res.json(req.user);
-});
-
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
