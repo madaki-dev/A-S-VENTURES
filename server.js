@@ -55,7 +55,7 @@ app.use("/api/farmer-dashboard", farmerDashboardRoutes);
 app.use("/api/profile", profileRoutes);
 
 //Images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 
 //Test Route
 app.get('/', (req, res) => {
@@ -63,6 +63,20 @@ app.get('/', (req, res) => {
         success: true,
         message: "A&S Ventures Backend Running"
     });
+});
+
+// ==========================================
+// GLOBAL ERROR HANDLER
+// ==========================================
+
+app.use((err, req, res, next) => {
+
+    console.error("GLOBAL ERROR:", err);
+
+    res.status(500).json({
+        message: err.message || "Internal server error"
+    });
+
 });
 
 const PORT = process.env.PORT || 3000;
