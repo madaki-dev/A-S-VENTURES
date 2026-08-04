@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        A&S Ventures| Profile Page
+    </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #032b03, #0e420e);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            animation: pageFade .3s ease;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .profile-container::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            left: -40px;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 128, 0, 0.3);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .profile-container::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 80px;
+            height: 80px;
+            background: rgba(11, 145, 11, 0.3);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info p {
+            font-size: 18px;
+            margin: 8px 0;
+        }
+
+        input[type="file"],
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input[type="file"] {
+            background: #fff;
+            color: #333;
+        }
+
+        button {
+            background: #042b0d;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #009900;
+            text-decoration: underline;
+            text-decoration-thickness: 0.2rem;
+            text-underline-offset: 0.5rem;
+        }
+
+        .profile-pic {
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 3px solid #fff;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        a {
+            display: inline-block;
+            padding: 1rem;
+            background: #042b0d;
+            transition: 0.3s;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            color: #fff;
+            border-radius: 0.7rem;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            text-decoration-thickness: 0.2rem;
+            text-underline-offset: 0.5rem;
+            background-color: #009900;
+        }
+
+        @keyframes pageFade {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(15px);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform: translateY(0);
+
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        <img id="profilePic" class="profile-pic" alt="Profile Picture">
+        <div class="profile-info">
+            <p><strong>Name:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Account Type:</strong> <span id="userType"></span></p>
+            <p><strong>Role:</strong> <span id="userRole"></span></p>
+
+        </div>
+        <form id="uploadForm">
+            <input type="file" id="profileImage" accept="image/*" required>
+            <button type="submit">Upload Profile Picture</button>
+        </form>
+        <div class="links">
+            <a href="index.html">Back to homepage</a>
+            <a href="marketplace.html">Back to marketplace</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("Please login first.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            // ==========================
+            // LOAD PROFILE
+            // ==========================
+
+            try {
+
+                const res = await fetch(
+                    "https://a-s-ventures-backend.onrender.com/api/profile",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                const user = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(user.message || "Could not load profile.");
+                }
+
+                document.getElementById("userName").textContent =
+                    user.fullName;
+
+                document.getElementById("userEmail").textContent =
+                    user.email;
+
+                document.getElementById("userType").textContent =
+                    user.accountType;
+
+                document.getElementById("userRole").textContent =
+                    user.role;
+
+
+                // ==========================
+                // LOAD PROFILE IMAGE
+                // ==========================
+
+                if (user.profileImage) {
+
+                    document.getElementById("profilePic").src =
+                        `https://a-s-ventures-backend.onrender.com/uploads/${user.profileImage}`;
+
+                }
+
+            } catch (error) {
+
+                console.error("PROFILE LOAD ERROR:", error);
+
+                alert("Could not load your profile.");
+
+            }
+
+
+            // ==========================
+            // UPLOAD PROFILE IMAGE
+            // ==========================
+
+            document
+                .getElementById("uploadForm")
+                .addEventListener("submit", async (e) => {
+
+                    e.preventDefault();
+
+                    const fileInput =
+                        document.getElementById("profileImage");
+
+                    const file =
+                        fileInput.files[0];
+
+                    if (!file) {
+
+                        alert("Please select an image.");
+
+                        return;
+
+                    }
+
+
+                    // Check file type
+
+                    if (!file.type.startsWith("image/")) {
+
+                        alert("Please select an image file.");
+
+                        return;
+
+                    }
+
+
+                    // Check file size
+
+                    if (file.size > 5 * 1024 * 1024) {
+
+                        alert("Image must be smaller than 5MB.");
+
+                        return;
+
+                    }
+
+
+                    const formData = new FormData();
+
+                    formData.append("image", file);
+
+
+                    try {
+
+                        console.log("Uploading:", file.name);
+
+
+                        const res = await fetch(
+                            "https://a-s-ventures-backend.onrender.com/api/profile/upload-profile",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${token}`
+                                },
+
+                                body: formData
+                            }
+                        );
+
+
+                        const data = await res.json();
+
+                        console.log(
+                            "Upload response:",
+                            data
+                        );
+
+
+                        if (!res.ok) {
+
+                            alert(
+                                data.message ||
+                                "Image upload failed."
+                            );
+
+                            return;
+
+                        }
+
+
+                        // Show uploaded image immediately
+
+                        document.getElementById("profilePic").src =
+                            `https://a-s-ventures-backend.onrender.com/uploads/${data.filename}`;
+
+
+                        alert(
+                            "Profile picture uploaded successfully!"
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "UPLOAD ERROR:",
+                            error
+                        );
+
+                        alert(
+                            "Something went wrong. Check the browser console."
+                        );
+
+                    }
+
+                });
+
+        });
+    </script>
+
+</body>
+
+</html>
