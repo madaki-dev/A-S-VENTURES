@@ -80,6 +80,8 @@ exports.getDashboard = async (req, res) => {
 
             revenue,
 
+            products,
+
             orders: farmerOrders
 
         });
