@@ -12,13 +12,15 @@ exports.initializePayment = async (req, res) => {
     try {
 
         const {
-            email,
             fullname,
             phone,
             whatsapp,
             state,
             address
         } = req.body;
+
+        // Get email from authenticated user
+        const email = req.user.email;
 
         // Check delivery information
         if (
