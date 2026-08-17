@@ -51,15 +51,6 @@ exports.initializePayment = async (req, res) => {
         // SAVE PRODUCTS IN PAYMENT SNAPSHOT
         // ==========================================
 
-        const paymentProducts = cart
-            .filter(item => item.product)
-            .map(item => ({
-                product: item.product._id,
-                quantity: Number(item.quantity),
-                farmerPrice: Number(item.product.farmerPrice),
-                commission: Number(item.product.commission),
-                sellingPrice: Number(item.product.sellingPrice)
-            }));
 
         // ==========================================
         // CALCULATE PRODUCTS TOTAL
