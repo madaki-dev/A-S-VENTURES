@@ -67,16 +67,48 @@ exports.initializePayment = async (req, res) => {
 
         let productsTotal = 0;
 
-        cart.forEach(item => {
+        const paymentProducts = [];
 
-            if (!item.product) return;
+        for (const item of cart) {
 
-            productsTotal +=
-                Number(item.product.sellingPrice) *
-                Number(item.quantity);
+            if (!item.product) {
+                continue;
+            }
 
-        });
+            const quantity = Number(item.quantity);
 
+            const sellingPrice =
+                Number(item.product.sellingPrice);
+
+            const farmerPrice =
+                Number(item.product.farmerPrice || 0);
+
+            const commission =
+                Number(item.product.commission || 0);
+
+            if (!Number.isFinite(quantity) || quantity < 1) {
+                return res.status(400).json({
+                    message: "Invalid product quantity."
+                });
+            }
+
+            if (!Number.isFinite(sellingPrice) || sellingPrice <= 0) {
+                return res.status(400).json({
+                    message:
+                        `Invalid selling price for product ${item.product._id}.`
+                });
+            }
+
+            productsTotal += sellingPrice * quantity;
+
+            paymentProducts.push({
+                product: item.product._id,
+                quantity,
+                farmerPrice,
+                commission,
+                sellingPrice
+            });
+        }
         // ==========================================
         // GET TRANSPORT PRICE
         // ==========================================
@@ -94,13 +126,20 @@ exports.initializePayment = async (req, res) => {
         const transportFee =
             Number(transport.transportPrice);
 
-        // ==========================================
-        // FINAL TOTAL
-        // ==========================================
+        if (!Number.isFinite(transportFee) || transportFee < 0) {
+            return res.status(400).json({
+                message: "Invalid transportation price."
+            });
+        }
 
         const totalAmount =
             productsTotal + transportFee;
 
+        if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+            return res.status(400).json({
+                message: "Invalid payment amount."
+            });
+        }
         // ==========================================
         // CREATE TRANSACTION REFERENCE
         // ==========================================
@@ -115,6 +154,25 @@ exports.initializePayment = async (req, res) => {
         // SAVE PAYMENT INFORMATION
         // ==========================================
 
+        console.log("========== CHECKOUT DEBUG ==========");
+
+        console.log("User ID:", req.user?._id);
+        console.log("User email:", req.user?.email);
+
+        console.log("Fullname:", fullname);
+        console.log("Phone:", phone);
+        console.log("WhatsApp:", whatsapp);
+        console.log("State:", state);
+        console.log("Address:", address);
+
+        console.log("Cart items:", cart.length);
+        console.log("Products total:", productsTotal);
+        console.log("Transport fee:", transportFee);
+        console.log("Total amount:", totalAmount);
+
+        console.log("Payment products:", paymentProducts);
+
+        console.log("====================================");
         await Payment.create({
 
             buyer: req.user._id,
@@ -211,20 +269,22 @@ exports.initializePayment = async (req, res) => {
 
     } catch (error) {
 
-        console.error(
-            "INITIALIZE PAYMENT ERROR:",
-            error.response?.data ||
-            error.message
-        );
+        console.error("========== PAYMENT INITIALIZATION ERROR ==========");
 
-        res.status(500).json({
+        console.error("Message:", error.message);
+        console.error("Status:", error.response?.status);
+        console.error("Response:", error.response?.data);
+        console.error("Stack:", error.stack);
 
+        console.error("===================================================");
+
+        return res.status(500).json({
             message:
-                error.response?.data ||
-                error.message
-
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                error.message ||
+                "Payment initialization failed."
         });
-
     }
 };
 
