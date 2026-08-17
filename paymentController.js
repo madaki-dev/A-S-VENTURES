@@ -190,6 +190,28 @@ exports.initializePayment = async (req, res) => {
 
         });
 
+        console.log("========== FLUTTERWAVE KEY CHECK ==========");
+
+        console.log(
+            "FLW_SECRET_KEY exists:",
+            !!process.env.FLW_SECRET_KEY
+        );
+
+        console.log(
+            "FLW_SECRET_KEY length:",
+            process.env.FLW_SECRET_KEY
+                ? process.env.FLW_SECRET_KEY.length
+                : 0
+        );
+
+        console.log(
+            "FLW_SECRET_KEY prefix:",
+            process.env.FLW_SECRET_KEY
+                ? process.env.FLW_SECRET_KEY.substring(0, 12)
+                : "MISSING"
+        );
+
+        console.log("============================================");
         // ==========================================
         // SEND PAYMENT TO FLUTTERWAVE
         // ==========================================
