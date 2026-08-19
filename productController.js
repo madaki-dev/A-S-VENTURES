@@ -1,51 +1,80 @@
 const Product = require("./product");
 
-
 // ===============================
 // CREATE PRODUCT
 // ===============================
 
 exports.createProduct = async (req, res) => {
-
     try {
-
-        const farmerPrice = Number(req.body.price);
-
-        if (!farmerPrice || farmerPrice <= 0) {
-
-            return res.status(400).json({
-                message: "Please enter a valid product price."
-            });
-
-        }
-
-
-        // A&S 10% commission
-        const commission = farmerPrice * 0.10;
-
-
-        // Farmer price + 10% commission
-        const sellingPrice = farmerPrice + commission;
-
 
         const {
             productName,
             category,
             quantity,
             location,
-            description,
-            stock
+            description
         } = req.body;
 
+        // ===============================
+        // VALIDATION
+        // ===============================
+
+        if (
+            !productName ||
+            !category ||
+            !quantity ||
+            !location ||
+            !description
+        ) {
+            return res.status(400).json({
+                message: "Please complete all product information."
+            });
+        }
 
         if (!req.file) {
-
             return res.status(400).json({
                 message: "Product image is required."
             });
-
         }
 
+        const quantityNumber = Number(quantity);
+
+        if (
+            !Number.isFinite(quantityNumber) ||
+            quantityNumber <= 0
+        ) {
+            return res.status(400).json({
+                message: "Please enter a valid quantity."
+            });
+        }
+
+        // ===============================
+        // FARMER PRICE
+        // ===============================
+
+        const farmerPrice = Number(req.body.price);
+
+        if (
+            !Number.isFinite(farmerPrice) ||
+            farmerPrice <= 0
+        ) {
+            return res.status(400).json({
+                message: "Please enter a valid product price."
+            });
+        }
+
+        // ===============================
+        // A&S 10% COMMISSION
+        // ===============================
+
+        const commission = farmerPrice * 0.10;
+
+        const sellingPrice =
+            farmerPrice + commission;
+
+        // ===============================
+        // CREATE PRODUCT
+        // ===============================
 
         const product = await Product.create({
 
@@ -55,13 +84,13 @@ exports.createProduct = async (req, res) => {
 
             category,
 
-            quantity,
+            quantity: quantityNumber,
+
+            stock: quantityNumber,
 
             location,
 
             description,
-
-            stock,
 
             farmerPrice,
 
@@ -73,6 +102,9 @@ exports.createProduct = async (req, res) => {
 
         });
 
+        // ===============================
+        // RESPONSE
+        // ===============================
 
         res.status(201).json({
 
@@ -82,7 +114,6 @@ exports.createProduct = async (req, res) => {
 
         });
 
-
     } catch (error) {
 
         console.error(
@@ -91,15 +122,12 @@ exports.createProduct = async (req, res) => {
         );
 
         res.status(500).json({
-
-            message: error.message
-
+            message:
+                error.message ||
+                "Failed to create product."
         });
-
     }
-
 };
-
 
 
 // ===============================
