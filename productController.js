@@ -87,6 +87,13 @@ exports.createProduct = async (req, res) => {
         const imageUrl =
             req.file.path;
 
+        if (!imageUrl) {
+            return res.status(500).json({
+                message:
+                    "Cloudinary image URL was not generated."
+            });
+        }
+
         // ===============================
         // CREATE PRODUCT
         // ===============================

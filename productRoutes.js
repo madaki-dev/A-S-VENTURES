@@ -1,106 +1,68 @@
 const express = require("express");
+const router = express.Router();
 
-const router =
-    express.Router();
-
-
-const Product =
-    require("./product");
-
+const Product = require("./product");
 
 const {
     createProduct,
     getProducts
-} =
-    require("./productController");
+} = require("./productController");
+
+const protect = require("./authMiddleware");
+const farmerOnly = require("./farmerMiddleware");
+
+const {
+    upload,
+    uploadToCloudinary
+} = require("./Uploads/uploads");
 
 
-const protect =
-    require("./authMiddleware");
-
-
-const farmerOnly =
-    require("./farmerMiddleware");
-
-
-const productUpload =
-    require("./Uploads/uploads");
-
-
-
-// ===============================
 // CREATE PRODUCT
-// ===============================
 
 router.post(
-
     "/",
-
     protect,
-
     farmerOnly,
-
-    productUpload.single("image"),
-
+    upload.single("image"),
+    uploadToCloudinary("as-ventures/products"),
     createProduct
-
 );
 
 
-
-// ===============================
 // GET ALL PRODUCTS
-// ===============================
 
 router.get(
-
     "/",
-
     getProducts
-
 );
 
 
-
-// ===============================
 // GET ONE PRODUCT
-// ===============================
 
 router.get(
-
     "/:id",
-
     async (req, res) => {
 
         try {
 
             const product =
                 await Product
-                    .findById(
-                        req.params.id
-                    )
+                    .findById(req.params.id)
                     .populate(
                         "farmer",
                         "fullName phone"
                     );
 
-
             if (!product) {
 
                 return res.status(404).json({
-
                     message:
                         "Product not found"
-
                 });
 
             }
 
-
-            return res.json(
-                product
-            );
-
+            res.json(product);
 
         } catch (error) {
 
@@ -109,18 +71,14 @@ router.get(
                 error
             );
 
-
-            return res.status(500).json({
-
+            res.status(500).json({
                 message:
                     error.message
-
             });
 
         }
 
     }
-
 );
 
 
