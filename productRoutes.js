@@ -17,7 +17,9 @@ const {
 } = require("./Uploads/uploads");
 
 
+// ==========================================
 // CREATE PRODUCT
+// ==========================================
 
 router.post(
     "/",
@@ -29,7 +31,9 @@ router.post(
 );
 
 
+// ==========================================
 // GET ALL PRODUCTS
+// ==========================================
 
 router.get(
     "/",
@@ -37,7 +41,9 @@ router.get(
 );
 
 
+// ==========================================
 // GET ONE PRODUCT
+// ==========================================
 
 router.get(
     "/:id",
@@ -56,8 +62,7 @@ router.get(
             if (!product) {
 
                 return res.status(404).json({
-                    message:
-                        "Product not found"
+                    message: "Product not found"
                 });
 
             }
@@ -72,8 +77,7 @@ router.get(
             );
 
             res.status(500).json({
-                message:
-                    error.message
+                message: error.message
             });
 
         }

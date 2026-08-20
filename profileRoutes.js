@@ -1,7 +1,6 @@
 const express = require("express");
 
-const router =
-    express.Router();
+const router = express.Router();
 
 const protect =
     require("./authMiddleware");
@@ -11,13 +10,15 @@ const {
     uploadProfileImage
 } = require("./profileController");
 
-const upload =
-    require("./Uploads/profileUploads");
+const {
+    upload,
+    uploadProfileToCloudinary
+} = require("./Uploads/profileUploads");
 
 
-// ==============================
+// ==========================================
 // GET PROFILE
-// ==============================
+// ==========================================
 
 router.get(
     "/",
@@ -26,14 +27,15 @@ router.get(
 );
 
 
-// ==============================
+// ==========================================
 // UPLOAD PROFILE IMAGE
-// ==============================
+// ==========================================
 
 router.post(
     "/upload-profile",
     protect,
     upload.single("image"),
+    uploadProfileToCloudinary,
     uploadProfileImage
 );
 
