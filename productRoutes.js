@@ -24,7 +24,7 @@ const farmerOnly =
 
 
 const productUpload =
-    require("./Uploads/productUpload");
+    require("./Uploads/uploads");
 
 
 

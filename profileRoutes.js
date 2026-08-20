@@ -12,7 +12,7 @@ const {
 } = require("./profileController");
 
 const upload =
-    require("./Uploads/uploads");
+    require("./Uploads/profileUploads");
 
 
 // ==============================
