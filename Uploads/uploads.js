@@ -1,51 +1,40 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../cloudinary");
 
-const uploadDirectory = path.join(__dirname, "..", "upload");
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
 
-// Create upload folder if it doesn't exist
-if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, {
-        recursive: true
-    });
-}
+    params: {
+        folder: "as-ventures/products",
 
-const storage = multer.diskStorage({
+        allowed_formats: [
+            "jpg",
+            "jpeg",
+            "png",
+            "webp"
+        ],
 
-    destination: function (req, file, cb) {
-        cb(null, uploadDirectory);
-    },
-
-    filename: function (req, file, cb) {
-
-        const extension =
-            path.extname(file.originalname);
-
-        const filename =
-            Date.now() +
-            "_" +
-            Math.round(Math.random() * 1E9) +
-            extension;
-
-        cb(null, filename);
+        transformation: [
+            {
+                width: 1200,
+                height: 1200,
+                crop: "limit",
+                quality: "auto"
+            }
+        ]
     }
-
 });
 
 const fileFilter = (req, file, cb) => {
 
     if (file.mimetype.startsWith("image/")) {
-
         cb(null, true);
-
     } else {
-
         cb(
             new Error("Only image files are allowed."),
             false
         );
-
     }
 };
 
