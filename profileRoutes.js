@@ -1,15 +1,18 @@
 const express = require("express");
 
-const router = express.Router();
+const router =
+    express.Router();
 
-const protect = require("./authMiddleware");
+const protect =
+    require("./authMiddleware");
 
 const {
     getProfile,
     uploadProfileImage
 } = require("./profileController");
 
-const upload = require("./Uploads/uploads");
+const upload =
+    require("./Uploads/uploads");
 
 
 // ==============================

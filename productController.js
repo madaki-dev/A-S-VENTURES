@@ -5,6 +5,7 @@ const Product = require("./product");
 // ===============================
 
 exports.createProduct = async (req, res) => {
+
     try {
 
         const {
@@ -27,24 +28,28 @@ exports.createProduct = async (req, res) => {
             !description
         ) {
             return res.status(400).json({
-                message: "Please complete all product information."
+                message:
+                    "Please complete all product information."
             });
         }
 
         if (!req.file) {
             return res.status(400).json({
-                message: "Product image is required."
+                message:
+                    "Product image is required."
             });
         }
 
-        const quantityNumber = Number(quantity);
+        const quantityNumber =
+            Number(quantity);
 
         if (
             !Number.isFinite(quantityNumber) ||
             quantityNumber <= 0
         ) {
             return res.status(400).json({
-                message: "Please enter a valid quantity."
+                message:
+                    "Please enter a valid quantity."
             });
         }
 
@@ -52,14 +57,16 @@ exports.createProduct = async (req, res) => {
         // FARMER PRICE
         // ===============================
 
-        const farmerPrice = Number(req.body.price);
+        const farmerPrice =
+            Number(req.body.price);
 
         if (
             !Number.isFinite(farmerPrice) ||
             farmerPrice <= 0
         ) {
             return res.status(400).json({
-                message: "Please enter a valid product price."
+                message:
+                    "Please enter a valid product price."
             });
         }
 
@@ -67,40 +74,53 @@ exports.createProduct = async (req, res) => {
         // A&S 10% COMMISSION
         // ===============================
 
-        const commission = farmerPrice * 0.10;
+        const commission =
+            farmerPrice * 0.10;
 
         const sellingPrice =
             farmerPrice + commission;
 
         // ===============================
+        // CLOUDINARY IMAGE URL
+        // ===============================
+
+        const imageUrl =
+            req.file.path;
+
+        // ===============================
         // CREATE PRODUCT
         // ===============================
 
-        const product = await Product.create({
+        const product =
+            await Product.create({
 
-            farmer: req.user._id,
+                farmer:
+                    req.user._id,
 
-            productName,
+                productName,
 
-            category,
+                category,
 
-            quantity: quantityNumber,
+                quantity:
+                    quantityNumber,
 
-            stock: quantityNumber,
+                stock:
+                    quantityNumber,
 
-            location,
+                location,
 
-            description,
+                description,
 
-            farmerPrice,
+                farmerPrice,
 
-            commission,
+                commission,
 
-            sellingPrice,
+                sellingPrice,
 
-            image: req.file.filename
+                image:
+                    imageUrl
 
-        });
+            });
 
         // ===============================
         // RESPONSE
@@ -108,7 +128,8 @@ exports.createProduct = async (req, res) => {
 
         res.status(201).json({
 
-            message: "Product uploaded successfully.",
+            message:
+                "Product uploaded successfully.",
 
             product
 
@@ -122,11 +143,15 @@ exports.createProduct = async (req, res) => {
         );
 
         res.status(500).json({
+
             message:
                 error.message ||
                 "Failed to create product."
+
         });
+
     }
+
 };
 
 
@@ -135,46 +160,70 @@ exports.createProduct = async (req, res) => {
 // ===============================
 
 exports.getProducts = async (req, res) => {
+
     try {
 
-        const page = Number(req.query.page) || 1;
-        const limit = 12;
-        const skip = (page - 1) * limit;
+        const page =
+            Number(req.query.page) || 1;
 
-        const keyword = req.query.search
-            ? {
-                productName: {
-                    $regex: req.query.search,
-                    $options: "i"
+        const limit = 12;
+
+        const skip =
+            (page - 1) * limit;
+
+        const keyword =
+            req.query.search
+                ? {
+                    productName: {
+                        $regex:
+                            req.query.search,
+                        $options: "i"
+                    }
                 }
-            }
-            : {};
+                : {};
 
         const totalProducts =
-            await Product.countDocuments(keyword);
+            await Product.countDocuments(
+                keyword
+            );
 
-        const products = await Product.find(keyword)
-            .skip(skip)
-            .limit(limit)
-            .populate("farmer", "fullName phone");
+        const products =
+            await Product.find(keyword)
+                .skip(skip)
+                .limit(limit)
+                .populate(
+                    "farmer",
+                    "fullName phone"
+                );
 
-        // Send pagination information in headers
-        res.set("X-Current-Page", page);
         res.set(
-            "X-Total-Pages",
-            Math.ceil(totalProducts / limit)
+            "X-Current-Page",
+            page
         );
 
-        // Keep the response as an ARRAY
+        res.set(
+            "X-Total-Pages",
+            Math.ceil(
+                totalProducts / limit
+            )
+        );
+
         res.json(products);
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "GET PRODUCTS ERROR:",
+            error
+        );
 
         res.status(500).json({
-            message: error.message
+
+            message:
+                error.message
+
         });
 
     }
+
 };
