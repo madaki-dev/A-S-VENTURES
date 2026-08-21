@@ -47,9 +47,7 @@ exports.sendContactMessage = async (req, res) => {
 
             from: "A&S Agri <onboarding@resend.dev>",
 
-            to: [
-                process.env.CONTACT_EMAIL
-            ],
+            to: process.env.CONTACT_EMAIL,
 
             replyTo: email,
 
