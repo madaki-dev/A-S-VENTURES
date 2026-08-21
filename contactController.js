@@ -1,12 +1,14 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
+
     service: "gmail",
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
+
 });
 
 
@@ -22,46 +24,33 @@ exports.sendContactMessage = async (req, res) => {
         } = req.body;
 
 
-        // ==============================
-        // VALIDATION
-        // ==============================
-
-        if (
-            !name ||
-            !email ||
-            !message
-        ) {
+        if (!name || !email || !message) {
 
             return res.status(400).json({
+
                 message:
-                    "Please complete all required fields."
+                    "Please complete your name, email and message."
+
             });
 
         }
 
 
-        // ==============================
-        // SEND EMAIL
-        // ==============================
-
         await transporter.sendMail({
 
-            from:
-                process.env.EMAIL_USER,
+            from: process.env.EMAIL_USER,
 
-            to:
-                process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
 
-            replyTo:
-                email,
+            replyTo: email,
 
             subject:
-                subject
-                    ? `A&S Agri Contact: ${subject}`
-                    : `New Contact Message from ${name}`,
+                subject ||
+                `New Contact Message from ${name}`,
 
             html: `
-                <h2>New Contact Message</h2>
+
+                <h2>New A&S Agri Contact Message</h2>
 
                 <p>
                     <strong>Name:</strong>
@@ -80,21 +69,16 @@ exports.sendContactMessage = async (req, res) => {
 
                 <hr>
 
-                <p>
-                    <strong>Message:</strong>
-                </p>
+                <h3>Message:</h3>
 
                 <p>
                     ${message.replace(/\n/g, "<br>")}
                 </p>
+
             `
 
         });
 
-
-        // ==============================
-        // SUCCESS
-        // ==============================
 
         res.status(200).json({
 
@@ -114,7 +98,7 @@ exports.sendContactMessage = async (req, res) => {
         res.status(500).json({
 
             message:
-                "Failed to send message. Please try again later."
+                "Failed to send message."
 
         });
 
