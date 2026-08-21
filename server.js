@@ -21,6 +21,7 @@ const transportRoutes = require("./transportRoutes");
 const adminRoutes = require("./adminRoutes");
 const farmerDashboardRoutes = require("./farmerDashboardRoutes");
 const profileRoutes = require("./profileRoutes");
+const contactRoutes = require("./contactRoutes");
 
 
 const app = express();
@@ -54,8 +55,7 @@ app.use("/api/farmer-dashboard", farmerDashboardRoutes);
 
 app.use("/api/profile", profileRoutes);
 
-//Images
-app.use("/upload", express.static(path.join(__dirname, "upload")));
+app.use("/api/contact", contactRoutes);
 
 //Test Route
 app.get('/', (req, res) => {
