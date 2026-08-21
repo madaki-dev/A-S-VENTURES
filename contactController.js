@@ -1,61 +1,8 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-
-    host: "142.250.102.109",
-
-    port: 587,
-
-    secure: false,
-
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-
-});
-
-// ==============================
-// VERIFY GMAIL CONNECTION
-// ==============================
-
-transporter.verify((error, success) => {
-
-    if (error) {
-
-        console.error(
-            "🔥 GMAIL CONNECTION FAILED:"
-        );
-
-        console.error(
-            "Message:",
-            error.message
-        );
-
-        console.error(
-            "Code:",
-            error.code
-        );
-
-        console.error(
-            "Command:",
-            error.command
-        );
-
-        console.error(
-            "Response:",
-            error.response
-        );
-
-    } else {
-
-        console.log(
-            "✅ GMAIL SMTP CONNECTION READY"
-        );
-
-    }
-
-});
+const resend = new Resend(
+    process.env.RESEND_API_KEY
+);
 
 
 // ==============================
@@ -74,14 +21,11 @@ exports.sendContactMessage = async (req, res) => {
         } = req.body;
 
 
-        console.log(
-            "📩 CONTACT REQUEST:",
-            {
-                name,
-                email,
-                subject
-            }
-        );
+        console.log("📩 CONTACT REQUEST:", {
+            name,
+            email,
+            subject
+        });
 
 
         if (!name || !email || !message) {
@@ -96,11 +40,16 @@ exports.sendContactMessage = async (req, res) => {
         }
 
 
-        const mailOptions = {
+        console.log("📤 SENDING EMAIL...");
 
-            from: process.env.EMAIL_USER,
 
-            to: process.env.EMAIL_USER,
+        const { data, error } = await resend.emails.send({
+
+            from: "A&S Agri <onboarding@resend.dev>",
+
+            to: [
+                process.env.CONTACT_EMAIL
+            ],
 
             replyTo: email,
 
@@ -137,23 +86,29 @@ exports.sendContactMessage = async (req, res) => {
 
             `
 
-        };
+        });
 
 
-        console.log(
-            "📤 SENDING EMAIL..."
-        );
+        if (error) {
 
-
-        const info =
-            await transporter.sendMail(
-                mailOptions
+            console.error(
+                "🔥 RESEND ERROR:",
+                error
             );
+
+            return res.status(500).json({
+
+                message:
+                    "Failed to send message."
+
+            });
+
+        }
 
 
         console.log(
             "✅ EMAIL SENT:",
-            info.messageId
+            data
         );
 
 
@@ -168,27 +123,8 @@ exports.sendContactMessage = async (req, res) => {
     } catch (error) {
 
         console.error(
-            "🔥 CONTACT EMAIL ERROR"
-        );
-
-        console.error(
-            "Message:",
-            error.message
-        );
-
-        console.error(
-            "Code:",
-            error.code
-        );
-
-        console.error(
-            "Command:",
-            error.command
-        );
-
-        console.error(
-            "Response:",
-            error.response
+            "🔥 CONTACT EMAIL ERROR:",
+            error
         );
 
         res.status(500).json({
