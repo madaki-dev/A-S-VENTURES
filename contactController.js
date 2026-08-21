@@ -1,16 +1,61 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-
     service: "gmail",
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
+});
+
+
+// ==============================
+// VERIFY GMAIL CONNECTION
+// ==============================
+
+transporter.verify((error, success) => {
+
+    if (error) {
+
+        console.error(
+            "🔥 GMAIL CONNECTION FAILED:"
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Code:",
+            error.code
+        );
+
+        console.error(
+            "Command:",
+            error.command
+        );
+
+        console.error(
+            "Response:",
+            error.response
+        );
+
+    } else {
+
+        console.log(
+            "✅ GMAIL SMTP CONNECTION READY"
+        );
+
+    }
 
 });
 
+
+// ==============================
+// SEND CONTACT MESSAGE
+// ==============================
 
 exports.sendContactMessage = async (req, res) => {
 
@@ -22,6 +67,16 @@ exports.sendContactMessage = async (req, res) => {
             subject,
             message
         } = req.body;
+
+
+        console.log(
+            "📩 CONTACT REQUEST:",
+            {
+                name,
+                email,
+                subject
+            }
+        );
 
 
         if (!name || !email || !message) {
@@ -36,7 +91,7 @@ exports.sendContactMessage = async (req, res) => {
         }
 
 
-        await transporter.sendMail({
+        const mailOptions = {
 
             from: process.env.EMAIL_USER,
 
@@ -46,7 +101,7 @@ exports.sendContactMessage = async (req, res) => {
 
             subject:
                 subject ||
-                `New Contact Message from ${name}`,
+                `New A&S Agri Contact Message from ${name}`,
 
             html: `
 
@@ -77,7 +132,24 @@ exports.sendContactMessage = async (req, res) => {
 
             `
 
-        });
+        };
+
+
+        console.log(
+            "📤 SENDING EMAIL..."
+        );
+
+
+        const info =
+            await transporter.sendMail(
+                mailOptions
+            );
+
+
+        console.log(
+            "✅ EMAIL SENT:",
+            info.messageId
+        );
 
 
         res.status(200).json({
@@ -91,8 +163,27 @@ exports.sendContactMessage = async (req, res) => {
     } catch (error) {
 
         console.error(
-            "CONTACT EMAIL ERROR:",
-            error
+            "🔥 CONTACT EMAIL ERROR"
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Code:",
+            error.code
+        );
+
+        console.error(
+            "Command:",
+            error.command
+        );
+
+        console.error(
+            "Response:",
+            error.response
         );
 
         res.status(500).json({
