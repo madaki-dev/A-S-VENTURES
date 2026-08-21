@@ -2,13 +2,11 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
 
-    host: "smtp.gmail.com",
+    host: "142.250.102.109",
 
     port: 587,
 
     secure: false,
-
-    family: 4,
 
     auth: {
         user: process.env.EMAIL_USER,
@@ -16,7 +14,6 @@ const transporter = nodemailer.createTransport({
     }
 
 });
-
 
 // ==============================
 // VERIFY GMAIL CONNECTION
