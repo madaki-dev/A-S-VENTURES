@@ -93,6 +93,11 @@ router.post(
             // IMPORTANT
             // ==================================
 
+            console.log(
+                "🔥 CLOUDINARY RESULT:",
+                result.secure_url
+            );
+
             req.file.path =
                 result.secure_url;
 

@@ -1,25 +1,126 @@
 const User = require("./User");
 
+
+// ==============================
+// GET PROFILE
+// ==============================
+
 exports.getProfile = async (req, res) => {
+
     try {
-        const user = await User.findById(req.user._id).select("-password");
-        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const user =
+            await User
+                .findById(req.user._id)
+                .select("-password");
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                message:
+                    "User not found"
+
+            });
+
+        }
+
         res.json(user);
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+
+        console.error(
+            "GET PROFILE ERROR:",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                error.message
+
+        });
+
     }
+
 };
 
-exports.uploadProfileImage = async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-        const user = await User.findById(req.user._id);
-        user.profileImage = req.file.filename;
+// ==============================
+// UPLOAD PROFILE IMAGE
+// ==============================
+
+exports.uploadProfileImage = async (
+    req,
+    res
+) => {
+
+    console.log("🔥 NEW PROFILE CONTROLLER RUNNING");
+
+    console.log("REQ.FILE:", req.file);
+
+
+    try {
+
+        if (!req.file) {
+
+            return res.status(400).json({
+
+                message:
+                    "No file uploaded"
+
+            });
+
+        }
+
+        const user =
+            await User.findById(
+                req.user._id
+            );
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                message:
+                    "User not found"
+
+            });
+
+        }
+
+        // Cloudinary URL
+        user.profileImage =
+            req.file.path;
+
         await user.save();
 
-        res.json({ message: "Profile image updated", filename: req.file.filename });
+        console.log("🔥 CLOUDINARY PATH:", req.file.path);
+
+        res.json({
+
+            message:
+                "Profile image updated",
+
+            imageUrl:
+                req.file.path
+
+        });
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+
+        console.error(
+            "PROFILE IMAGE ERROR:",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                error.message
+
+        });
+
     }
+
 };
